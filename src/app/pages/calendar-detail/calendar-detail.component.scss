@@ -1,0 +1,13 @@
+.single-event-container {
+  overflow: auto;
+
+  .single-event {
+    cursor: pointer;
+    font-size: 14px;
+  }
+}
+
+.close-date {
+  cursor: pointer;
+  z-index: 99999;
+}

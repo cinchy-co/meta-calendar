@@ -1,0 +1,21 @@
+<div class="p-2 cal-month-view box-shadow-calendar" *ngIf="dayDetails.events && dayDetails.events.length">
+  <div class="d-flex justify-content-between">
+    <span><b>Date:</b> {{dayDetails.events[0].start | date}}</span>
+    <span class="close-date" (click)="closeDate()"><i class="bi bi-x-octagon-fill"></i></span>
+  </div>
+  <hr>
+
+  <div class="single-event-container" [ngStyle]="{'max-height': maxHeight+'px'}">
+    <div class="mb-2 single-event p-1" *ngFor="let event of dayDetails.events" [ngClass]="event?.cssClass"
+         (click)="handleEvent('open', event)"
+         [ngStyle]="{'background-color': event.color['primary'], 'color': event.meta.textColor}">
+      <!-- <span class="cal-event" [style.backgroundColor]="event.color?.primary"></span>-->
+      <span class="fw-600" *ngIf="event.allDay">All Day Event<br></span>
+      <span class="fw-600" *ngIf="!event.allDay">
+       {{event.meta.startHourTime | time24to12Transform}} - {{event.meta.endHourTime | time24to12Transform}}
+        <br>
+      </span>
+      <span [innerHTML]="event.title"></span>
+    </div>
+  </div>
+</div>

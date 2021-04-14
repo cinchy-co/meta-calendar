@@ -1,0 +1,193 @@
+<section class="calendar-wrapper">
+  <div class="d-flex justify-content-between" *ngIf="calendarQuery && calendarQuery.showTitle">
+    <h1 class="text-center">{{calendarQuery.title}}</h1>
+    <br/>
+    <hr>
+  </div>
+
+
+  <ng-container>
+    <div class="d-flex justify-content-between calendar-header">
+      <app-all-calendar></app-all-calendar>
+
+      <div class="d-flex flex-basis-66">
+        <div class="row text-center width-100" *ngIf="calendarQuery">
+          <div class="col-md-4">
+            <div class="btn-group">
+              <div
+                class="btn btn-danger"
+                [class.active]="currentButtonState === 'past'"
+                (click)=checkForDate()
+                mwlCalendarPreviousView
+                [view]="view"
+                [(viewDate)]="viewDate"
+                (viewDateChange)="closeOpenMonthViewDay()">
+                Previous
+              </div>
+              <div
+                class="btn btn-danger"
+                [class.active]="currentButtonState === 'today'"
+                (click)=checkForDate()
+                mwlCalendarToday
+                [(viewDate)]="viewDate">
+                Today
+              </div>
+              <div
+                class="btn btn-danger"
+                [class.active]="currentButtonState === 'future'"
+                (click)=checkForDate()
+                mwlCalendarNextView
+                [view]="view"
+                [(viewDate)]="viewDate"
+                (viewDateChange)="closeOpenMonthViewDay()">
+                Next
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <h3>{{ viewDate | calendarDate:(view + 'ViewTitle'):'en' }}</h3>
+          </div>
+          <div class="col-md-4">
+            <div class="btn-group">
+              <div
+                class="btn btn-danger"
+                (click)="setView(CalendarView.Month)"
+                [class.active]="view === CalendarView.Month">
+                Month
+              </div>
+              <div
+                class="btn btn-danger"
+                (click)="setView(CalendarView.Week)"
+                [class.active]="view === CalendarView.Week">
+                Week
+              </div>
+              <div
+                class="btn btn-danger"
+                (click)="setView(CalendarView.Day)"
+                [class.active]="view === CalendarView.Day">
+                Day
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="search">
+        <i class="bi bi-search"></i>
+        <input *ngIf="calendarQuery" type="text" class="form-control" placeholder="Search.."
+               [formControl]="searchControl"/>
+      </div>
+    </div>
+    <hr>
+
+    <ng-template #customCellTemplate let-day="day" let-locale="locale">
+      <div class="cal-cell-top" [ngClass]="{'bg-gray' : day.isPast}">
+        <span class="cal-day-badge" *ngIf="day.badgeTotal > 0">{{ day.badgeTotal }}</span>
+        <span class="cal-day-number">{{ day.date | calendarDate:'monthViewDayNumber':locale }}</span>
+      </div>
+      <ng-container *ngIf="day.badgeTotal > 0">
+        <ng-container *ngFor="let event of day.events; let i = index">
+          <small *ngIf="i < 4" class="event-item" (click)="handleEvent('open', event)"
+                 [ngStyle]="{'background-color': event.color['primary'], 'color': event.meta.textColor}">
+            <span [innerHTML]="event.title"></span>
+          </small>
+        </ng-container>
+        <small class="more-events" [ngClass]="{'bg-gray' : day.isPast}"
+               *ngIf="day.events && day.events.length > 4">+{{day.events.length - 4}} more</small>
+      </ng-container>
+    </ng-template>
+
+    <ng-template #eventTemplate let-weekEvent="weekEvent" let-locale="locale">
+      <div class="cal-event" (click)="handleEvent('open', weekEvent.event)"
+           [ngbPopover]="popContent" triggers="mouseenter:mouseleave" popoverTitle="Event" container="body"
+           [ngStyle]="{'background-color': weekEvent.event.color['primary'], 'color': weekEvent.event.meta.textColor}">
+        <span [innerHTML]="weekEvent.event.title"></span>
+      </div>
+
+      <ng-template #popContent>
+        <span [innerHTML]="weekEvent.event.title"></span>
+      </ng-template>
+    </ng-template>
+
+    <div [ngClass]="{'d-flex': selectedDayDetails}">
+      <div [ngClass]="{'flex-basis-80': selectedDayDetails}" [ngSwitch]="view" #monthView
+           *ngIf="filteredEvents && filteredEvents.length; else noItemToShow" class="box-shadow-calendar">
+        <mwl-calendar-month-view
+          *ngSwitchCase="CalendarView.Month"
+          [viewDate]="viewDate"
+          [events]="filteredEvents"
+          [refresh]="refresh"
+          [activeDayIsOpen]="activeDayIsOpen"
+          [openDayEventsTemplate]="customOpenDayEventsTemplate"
+          [cellTemplate]="customCellTemplate"
+          (dayClicked)="dayClicked($event.day)"
+          (eventClicked)="handleEvent('Clicked', $event.event)"
+          (eventTimesChanged)="eventTimesChanged($event)"
+        >
+        </mwl-calendar-month-view>
+        <mwl-calendar-week-view
+          *ngSwitchCase="CalendarView.Week"
+          [viewDate]="viewDate"
+          [events]="filteredEvents"
+          [refresh]="refresh"
+          [eventTemplate]="eventTemplate"
+          (dayHeaderClicked)="weekHeaderClicked($event)"
+          (eventClicked)="handleEvent('Clicked', $event.event)"
+          (eventTimesChanged)="eventTimesChanged($event)"
+        >
+        </mwl-calendar-week-view>
+        <mwl-calendar-day-view
+          *ngSwitchCase="CalendarView.Day"
+          [viewDate]="viewDate"
+          [events]="filteredEvents"
+          [refresh]="refresh"
+          [eventTemplate]="eventTemplate"
+          (eventClicked)="handleEvent('Clicked', $event.event)"
+          (eventTimesChanged)="eventTimesChanged($event)"
+        >
+        </mwl-calendar-day-view>
+      </div>
+
+      <app-calendar-detail class="flex-basis-20 box-shadow-calendar" *ngIf="selectedDayDetails"
+                           [dayDetails]="selectedDayDetails"
+                           [maxHeight]="heightForDetailsView"
+                           [calendarQuery]="calendarQuery"
+                           (closeDateClicked)="closeOpenMonthViewDay()">
+      </app-calendar-detail>
+    </div>
+
+    <ng-template
+      #customOpenDayEventsTemplate
+      let-events="events"
+      let-isOpen="isOpen">
+
+      <!-- The [@collapse] is causing the error. -->
+      <div class="cal-open-day-events" *ngIf="false">
+        <div class="d-flex justify-content-between">
+          <span><b>Date:</b> {{events[0].start | date}}</span>
+          <span class="close-date" (click)="closeOpenMonthViewDay()">
+            <i class="bi bi-x-octagon-fill"></i>
+            <!-- <i class="bi bi-backspace"></i>-->
+          </span>
+        </div>
+        <hr>
+        <div *ngFor="let event of events" [ngClass]="event?.cssClass">
+          <span class="cal-event" [style.backgroundColor]="event.color?.primary"></span>
+          <mwl-calendar-event-title [event]="event"
+                                    (click)="handleEvent('open', event)"
+                                    view="month">
+          </mwl-calendar-event-title>
+        </div>
+      </div>
+
+    </ng-template>
+
+    <ng-template #noItemToShow>
+      <div *ngIf="calendarQuery" class="alert alert-info" role="alert">
+        No Results for the corresponding selected scenario!
+      </div>
+    </ng-template>
+  </ng-container>
+
+
+</section>

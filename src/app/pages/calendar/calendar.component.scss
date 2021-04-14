@@ -1,0 +1,109 @@
+.calendar-wrapper {
+  padding: 20px;
+
+  .calendar-header {
+    font-size: 14px;
+  }
+
+  .btn {
+    font-size: 1rem;
+    line-height: 1.2;
+  }
+
+  .btn-outline-danger {
+    background: white;
+
+    &:hover {
+      color: #e7015b;
+    }
+  }
+
+  .btn-danger {
+    background: #e7015b;
+
+    &.active {
+      background: white;
+      color: #bd2130;
+      border-color: #b21f2d;
+    }
+  }
+
+  .search {
+    flex-basis: 25%;
+    position: relative;
+
+    i {
+      position: absolute;
+      top: 3px;
+      left: 8px;
+    }
+
+    input {
+      font-size: 13px;
+      padding-left: 28px;
+    }
+  }
+}
+
+.bg-gray {
+  background-color: #ededed;
+}
+
+.event-item {
+  background: darkorange;
+  border: 1px solid white;
+  border-radius: 6px;
+  padding: 2px 4px;
+  max-height: 43px;
+  overflow: hidden;
+  z-index: 999;
+  word-break: break-word;
+}
+
+.more-events {
+  font-weight: bold;
+  color: #b94a48;
+  text-align: center;
+  font-size: 15px;
+}
+
+app-calendar-detail {
+  background: #ccc;
+  border: 3px solid gray;
+}
+
+:host ::ng-deep mwl-calendar-month-view > .cal-month-view {
+  .cal-day-cell {
+    min-height: 160px;
+  }
+
+  .cal-cell-top {
+    min-height: 50px;
+    flex: 1;
+  }
+
+  .cal-cell-row .cal-cell:hover, .cal-cell.cal-has-events.cal-open {
+    background-color: #f7f5f9;
+  }
+
+  .cal-day-cell.cal-today {
+    background-color: white;
+  }
+
+  .cal-cell-row:hover {
+    background-color: transparent;
+  }
+}
+
+:host ::ng-deep mwl-calendar-week-view {
+  .cal-week-view .cal-event {
+    color: black;
+  }
+}
+
+:host ::ng-deep mwl-calendar-day-view {
+  .cal-event {
+    color: black;
+  }
+}
+
