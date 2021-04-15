@@ -1,8 +1,18 @@
 .calendar-wrapper {
-  padding: 20px;
 
   .calendar-header {
     font-size: 14px;
+    position: fixed;
+    width: 100%;
+    padding: 15px 10px 10px;
+    z-index: 1000;
+    background: #f7f5f9;
+    top:0;
+  }
+
+  .calendar-body{
+    padding: 10px;
+    margin-top: 4rem;
   }
 
   .btn {
@@ -54,7 +64,8 @@
   border: 1px solid white;
   border-radius: 6px;
   padding: 2px 4px;
-  max-height: 43px;
+  max-height: 26px;
+  text-overflow: ellipsis;
   overflow: hidden;
   z-index: 999;
   word-break: break-word;

@@ -78,38 +78,9 @@
                [formControl]="searchControl"/>
       </div>
     </div>
-    <hr>
 
-    <ng-template #customCellTemplate let-day="day" let-locale="locale">
-      <div class="cal-cell-top" [ngClass]="{'bg-gray' : day.isPast}">
-        <span class="cal-day-badge" *ngIf="day.badgeTotal > 0">{{ day.badgeTotal }}</span>
-        <span class="cal-day-number">{{ day.date | calendarDate:'monthViewDayNumber':locale }}</span>
-      </div>
-      <ng-container *ngIf="day.badgeTotal > 0">
-        <ng-container *ngFor="let event of day.events; let i = index">
-          <small *ngIf="i < 4" class="event-item" (click)="handleEvent('open', event)"
-                 [ngStyle]="{'background-color': event.color['primary'], 'color': event.meta.textColor}">
-            <span [innerHTML]="event.title"></span>
-          </small>
-        </ng-container>
-        <small class="more-events" [ngClass]="{'bg-gray' : day.isPast}"
-               *ngIf="day.events && day.events.length > 4">+{{day.events.length - 4}} more</small>
-      </ng-container>
-    </ng-template>
-
-    <ng-template #eventTemplate let-weekEvent="weekEvent" let-locale="locale">
-      <div class="cal-event" (click)="handleEvent('open', weekEvent.event)"
-           [ngbPopover]="popContent" triggers="mouseenter:mouseleave" popoverTitle="Event" container="body"
-           [ngStyle]="{'background-color': weekEvent.event.color['primary'], 'color': weekEvent.event.meta.textColor}">
-        <span [innerHTML]="weekEvent.event.title"></span>
-      </div>
-
-      <ng-template #popContent>
-        <span [innerHTML]="weekEvent.event.title"></span>
-      </ng-template>
-    </ng-template>
-
-    <div [ngClass]="{'d-flex': selectedDayDetails}">
+    <div [ngClass]="{'d-flex': selectedDayDetails}" class="calendar-body">
+      <hr>
       <div [ngClass]="{'flex-basis-80': selectedDayDetails}" [ngSwitch]="view" #monthView
            *ngIf="filteredEvents && filteredEvents.length; else noItemToShow" class="box-shadow-calendar">
         <mwl-calendar-month-view
@@ -155,6 +126,35 @@
                            (closeDateClicked)="closeOpenMonthViewDay()">
       </app-calendar-detail>
     </div>
+
+    <ng-template #customCellTemplate let-day="day" let-locale="locale">
+      <div class="cal-cell-top" [ngClass]="{'bg-gray' : day.isPast}">
+        <span class="cal-day-badge" *ngIf="day.badgeTotal > 0">{{ day.badgeTotal }}</span>
+        <span class="cal-day-number">{{ day.date | calendarDate:'monthViewDayNumber':locale }}</span>
+      </div>
+      <ng-container *ngIf="day.badgeTotal > 0">
+        <ng-container *ngFor="let event of day.events; let i = index">
+          <small *ngIf="i < 3" class="event-item" (click)="handleEvent('open', event)"
+                 [ngStyle]="{'background-color': event.color['primary'], 'color': event.meta.textColor}">
+            <span [innerHTML]="event.title"></span>
+          </small>
+        </ng-container>
+        <small class="more-events" [ngClass]="{'bg-gray' : day.isPast}"
+               *ngIf="day.events && day.events.length > 3">+{{day.events.length - 3}} more</small>
+      </ng-container>
+    </ng-template>
+
+    <ng-template #eventTemplate let-weekEvent="weekEvent" let-locale="locale">
+      <div class="cal-event" (click)="handleEvent('open', weekEvent.event)"
+           [ngbPopover]="popContent" triggers="mouseenter:mouseleave" popoverTitle="Event" container="body"
+           [ngStyle]="{'background-color': weekEvent.event.color['primary'], 'color': weekEvent.event.meta.textColor}">
+        <span [innerHTML]="weekEvent.event.title"></span>
+      </div>
+
+      <ng-template #popContent>
+        <span [innerHTML]="weekEvent.event.title"></span>
+      </ng-template>
+    </ng-template>
 
     <ng-template
       #customOpenDayEventsTemplate

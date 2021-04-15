@@ -2,12 +2,19 @@
   overflow: auto;
 
   .single-event {
-    cursor: pointer;
+    position: relative;
     font-size: 14px;
+  }
+
+  .external-icon {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    cursor: pointer;
   }
 }
 
 .close-date {
   cursor: pointer;
-  z-index: 99999;
+  z-index: 99;
 }

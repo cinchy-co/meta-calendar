@@ -103,7 +103,7 @@ export class CalendarComponent implements OnInit {
       this.subscribeToSearchStr();
       this.cdr.markForCheck();
       setTimeout(() => {
-        this.heightForDetailsView = this.monthView.nativeElement.offsetHeight || 1000;
+        this.heightForDetailsView = this.monthView.nativeElement.offsetHeight - 60 || 1000;
       }, 300);
       this.spinner.hide();
     } catch (e) {
