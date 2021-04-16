@@ -1,4 +1,13 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  OnInit,
+  TemplateRef,
+  ViewChild
+} from '@angular/core';
 import {
   CalendarEvent,
   CalendarEventAction,
@@ -7,7 +16,7 @@ import {
   CalendarView
 } from 'angular-calendar';
 import {Subject} from 'rxjs';
-import {add, addHours, endOfDay, isSameDay, isSameMonth, startOfDay} from 'date-fns';
+import {add, addHours, differenceInMinutes, endOfDay, isSameDay, isSameMonth, startOfDay, startOfHour} from 'date-fns';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {CinchyService} from '@cinchy-co/angular-sdk';
 import {ColorsArr, ICalendarMeta, IEventResp} from '../../general.model';
@@ -23,9 +32,10 @@ import {NgxSpinnerService} from 'ngx-spinner';
   styleUrls: ['./calendar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CalendarComponent implements OnInit {
+export class CalendarComponent implements OnInit, AfterViewInit {
   @ViewChild('modalContent', {static: true}) modalContent!: TemplateRef<any>;
-  @ViewChild('monthView') monthView!: ElementRef;
+  @ViewChild('scrollContainer') scrollContainer!: ElementRef<HTMLElement>;
+
   view: CalendarView = CalendarView.Month;
   CalendarView = CalendarView;
   viewDate: Date = new Date();
@@ -64,6 +74,33 @@ export class CalendarComponent implements OnInit {
     }
   }
 
+  ngAfterViewInit() {
+    if (this.scrollContainer?.nativeElement) {
+      this.scrollToCurrentView();
+    }
+  }
+
+  viewChanged() {
+    this.cdr.detectChanges();
+    this.scrollToCurrentView();
+  }
+
+  private scrollToCurrentView() {
+    if (this.view === CalendarView.Week || CalendarView.Day) {
+      // each hour is 60px high, so to get the pixels to scroll it's just the amount of minutes since midnight
+      const minutesSinceStartOfDay = differenceInMinutes(
+        startOfHour(new Date()),
+        startOfDay(new Date())
+      );
+      console.log('minutesSinceStartOfDay', minutesSinceStartOfDay, this.scrollContainer.nativeElement)
+      const headerHeight = this.view === CalendarView.Week ? 60 : 0;
+    //  window.scrollTo({top: (minutesSinceStartOfDay + headerHeight)});
+      this.scrollContainer.nativeElement.scrollIntoView();
+      this.scrollContainer.nativeElement.scrollTop =
+        minutesSinceStartOfDay + headerHeight;
+    }
+  }
+
   async getDatesForEvents(savedQuery: ICalendarMeta): Promise<any> {
     try {
       this.spinner.show();
@@ -82,7 +119,10 @@ export class CalendarComponent implements OnInit {
         const endHourMinutes = endDate.getMinutes() < 10 ? `0${endDate.getMinutes()}` : endDate.getMinutes();
 
         const actualEvent: CalendarEvent = {
-          start: add(startOfDay(new Date(item.Event_Start_Date)), {hours: startHourTime, minutes: startDate.getMinutes()}),
+          start: add(startOfDay(new Date(item.Event_Start_Date)), {
+            hours: startHourTime,
+            minutes: startDate.getMinutes()
+          }),
           end: add(startOfDay(new Date(item.Event_End_Date)), {hours: endHourTime, minutes: endDate.getMinutes()}),
           allDay: item.Is_Full_Day_Event === 'Yes',
           title: `${item.Event_Title}`,
@@ -103,7 +143,7 @@ export class CalendarComponent implements OnInit {
       this.subscribeToSearchStr();
       this.cdr.markForCheck();
       setTimeout(() => {
-        this.heightForDetailsView = this.monthView.nativeElement.offsetHeight - 60 || 1000;
+        this.heightForDetailsView = this.scrollContainer.nativeElement.offsetHeight - 60 || 1000;
       }, 300);
       this.spinner.hide();
     } catch (e) {
@@ -154,6 +194,7 @@ export class CalendarComponent implements OnInit {
 
   setView(view: CalendarView): void {
     this.view = view;
+    this.viewChanged();
   }
 
   closeOpenMonthViewDay(): void {

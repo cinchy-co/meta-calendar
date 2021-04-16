@@ -65,6 +65,38 @@ body > * {
   right: 0;
 }
 
+/*.cal-week-view .cal-time-events {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.cal-month-view .cal-days {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.cal-week-view .cal-all-day-events {
+  max-height: 220px;
+  overflow-y: auto;
+}*/
+
+.scroll-container {
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.cal-month-view .cal-header, .cal-day-headers {
+  position: sticky;
+  width: 100%;
+  z-index: 9;
+  background: white !important;
+  top: 0;
+
+  &:hover {
+    background-color: white;
+    z-index: 9;
+  }
+}
 
 //Scroll bar stylesheet
 /* width */
